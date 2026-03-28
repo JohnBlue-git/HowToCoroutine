@@ -18,7 +18,7 @@ Each version uses a different concurrency model, but preserves equivalent output
 
 ## Shared Building Blocks
 
-All `.cpp` files contain two key helpers:
+A common helper header now centralizes shared behavior in `common.hpp` and is included by each source file (`fork_version.cpp`, `thread_version.cpp`, `coroutine_version.cpp`).
 
 - `apply_fun_multiple_times(x, times)`
   - Loops `times` times and doubles `x` each iteration.
@@ -27,6 +27,8 @@ All `.cpp` files contain two key helpers:
 - `checksum(values)`
   - Computes a rolling hash-like checksum from the full result array.
   - Used as a correctness signal so different implementations can be compared safely.
+
+This keeps each execution model source file focused on concurrency details instead of duplicating core math logic.
 
 ## [thread_version.cpp](thread_version.cpp)
 

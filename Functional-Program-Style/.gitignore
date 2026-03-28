@@ -1,0 +1,20 @@
+# C++ build artifacts
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.dylib
+*.exe
+*.out
+
+# Project binaries (if built locally in this folder)
+traditional
+coroutine
+
+# Build directories (if any local builds)
+build/
+
+# VS Code workspace settings (optional)
+.vscode/

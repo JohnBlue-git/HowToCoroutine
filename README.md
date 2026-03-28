@@ -1,5 +1,3 @@
-# HowToCoroutine
-
 ## Coroutine Introduction
 
 ### Why use coroutine?
@@ -57,62 +55,36 @@ C++ provides both language-level and library-level building blocks:
 
 Note: the standard gives primitives, but not a full scheduler runtime by default. Applications typically build or adopt a scheduler/executor on top.
 
-## Sample Project
+### Repository Structure
 
-The following project demonstrates three C++ implementations for repeatedly applying:
+This repository demonstrates C++ coroutines in two main contexts:
 
-- `f(x) = 2 * x`
+- **Fork-Thread-Coroutine**: A direct performance comparison of three parallel computation implementations: fork (processes), threads, and coroutines.
+- **Functional-Program-Style**: Illustrates how coroutines improve functional programming by enabling cleaner async/await patterns compared to traditional callback-based approaches.
 
-Each implementation computes `f` multiple times per input value and stores final results in `main()`.
+### Improvements in Functional Programming with Coroutines
 
-### Implementations
+Coroutines significantly enhance functional programming in C++ by allowing asynchronous operations to be expressed in a sequential, composable style using `co_await`. This addresses common pain points in functional async code:
 
-- `src/fork_version.cpp`: parallel via multiple child processes (`fork` + pipes)
-- `src/thread_version.cpp`: parallel via `std::thread`
-- `src/coroutine_version.cpp`: cooperative scheduling via C++20 coroutines
+- **Avoiding Callback Hell**: Traditional asynchronous programming relies on callbacks or futures, which can lead to deeply nested, hard-to-read code. Coroutines flatten this into linear, readable sequences.
+- **Composability**: Async functions can be composed like regular functions, making it easier to build complex workflows without manual promise chaining.
+- **Error Handling**: Exceptions work naturally across suspension points, unlike callback-based error propagation.
+- **Readability**: Code resembles synchronous logic, improving maintainability and reducing bugs in functional-style async applications.
 
-### Build Manually
+### Comparison Among Fork, Thread, and Coroutine
 
-```bash
-g++ -std=c++20 -O2 -pthread src/fork_version.cpp -o fork
-g++ -std=c++20 -O2 -pthread src/thread_version.cpp -o thread
-g++ -std=c++20 -O2 -pthread src/coroutine_version.cpp -o coroutine
-```
+Here's a consolidated comparison of the three concurrency models used in this repository:
 
-Run one version:
+| Aspect | Fork | Thread | Coroutine |
+|--------|------|--------|-----------|
+| **Scheduling** | OS-preemptive (processes) | OS-preemptive | User-space cooperative |
+| **Parallelism** | True (multi-core) | True (multi-core) | Single-threaded by default |
+| **Overhead** | High (process creation, IPC) | Medium (context switches) | Low (lightweight switches) |
+| **Isolation** | Strong (separate memory) | Weak (shared memory) | None (same process/thread) |
+| **Scalability** | Limited by cores/processes | Limited by cores/threads | High (thousands of tasks) |
+| **Best For** | Isolation-heavy tasks | CPU-bound parallelism | I/O-bound, many small tasks |
+| **C++ Support** | `fork()`, pipes | `std::thread` | C++20 `<coroutine>` |
 
-```bash
-./thread 800000 24
-```
-
-Arguments:
-
-1. `count`: number of input values, using `1..count`
-2. `times`: how many times to apply `f(x) = 2*x`
-
-### Pytest Benchmark Comparison
-
-Test file: `tests/test_resource_compare.py`
-
-It compiles all three binaries and compares:
-
-- CPU time (`resource.getrusage`, user + system)
-- peak memory (`psutil`, process RSS peak)
-- wall-clock time (`time.perf_counter`)
-
-### Field Meanings
-
-| Field | Meaning |
-| --- | --- |
-| `version` | Which implementation is measured: `fork`, `thread`, or `coroutine`. |
-| `cpu_seconds` | Total CPU time consumed by child process: user time + system time (seconds). |
-| `max_rss_kb` | Peak resident memory usage in KB (maximum observed RSS). |
-| `wall_seconds` | Real elapsed time from start to finish in seconds. |
-| `elapsed_ms` | Runtime reported by each C++ program itself in milliseconds. |
-| `checksum` | Result integrity value; all versions should produce the same checksum. |
-
-Run:
-
-```bash
-pytest -s -q
-```
+- **Fork**: Ideal for tasks requiring strong isolation (e.g., security-critical computations), but expensive for frequent use.
+- **Thread**: Balances parallelism and ease; great for CPU-intensive work on multi-core systems.
+- **Coroutine**: Excels in structuring complex async logic, especially in functional programming, but may need threading for full multi-core utilization.

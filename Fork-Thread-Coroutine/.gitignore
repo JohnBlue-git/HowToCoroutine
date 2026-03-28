@@ -13,8 +13,6 @@
 fork
 thread
 coroutine
-traditional
-coroutine_async
 
 # Build directories
 build/
@@ -28,21 +26,5 @@ __pycache__/
 venv/
 env/
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# VS Code workspace settings
+# VS Code workspace settings (optional)
 .vscode/
-
-# Archives and temporary files
-*.tar
-*.tar.gz
-*.zip
-*.log
-ball.tar

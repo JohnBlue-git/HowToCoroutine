@@ -10,6 +10,7 @@
 #include <thread>
 #include <unistd.h>
 #include <vector>
+#include "common.hpp"
 
 namespace {
 
@@ -19,13 +20,6 @@ struct WorkerPipe {
     std::size_t start;
     std::size_t len;
 };
-
-uint64_t apply_fun_multiple_times(uint64_t x, uint32_t times) {
-    for (uint32_t i = 0; i < times; ++i) {
-        x *= 2;
-    }
-    return x;
-}
 
 void write_all(int fd, const uint8_t* buffer, std::size_t bytes) {
     std::size_t written = 0;
@@ -50,14 +44,6 @@ void read_all(int fd, uint8_t* buffer, std::size_t bytes) {
         }
         received += static_cast<std::size_t>(n);
     }
-}
-
-uint64_t checksum(const std::vector<uint64_t>& values) {
-    uint64_t sum = 0;
-    for (uint64_t value : values) {
-        sum ^= value + 0x9e3779b97f4a7c15ULL + (sum << 6U) + (sum >> 2U);
-    }
-    return sum;
 }
 
 }  // namespace
