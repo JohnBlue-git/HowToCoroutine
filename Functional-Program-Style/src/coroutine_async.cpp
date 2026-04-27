@@ -104,10 +104,15 @@ task<int> async_double(int x) {
 }
 
 task<int> async_sum(int count) {
-    int total = 0;
+    // concurrency task
+    std::vector<task<int>> tasks;
     for (int i = 1; i <= count; ++i) {
-        int doubled = co_await async_double(i);
-        total += doubled;
+        tasks.push_back(async_double(i));
+    }
+    // await results
+    int total = 0;
+    for (auto& t : tasks) {
+        total += co_await t;
     }
     co_return total;
 }
