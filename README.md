@@ -57,19 +57,41 @@ Note: the standard gives primitives, but not a full scheduler runtime by default
 
 ### Repository Structure
 
-This repository demonstrates C++ coroutines in two main contexts:
+This repository contains three main projects demonstrating different aspects of C++20 coroutines:
 
-- **Fork-Thread-Coroutine**: A direct performance comparison of three parallel computation implementations: fork (processes), threads, and coroutines.
-- **Functional-Program-Style**: Illustrates how coroutines improve functional programming by enabling cleaner async/await patterns compared to traditional callback-based approaches.
+#### 1. Fork-Thread-Coroutine
+A direct performance comparison of three parallel computation implementations: fork (processes), threads, and coroutines.
+- **Learn**: Practical performance trade-offs between process isolation, threading overhead, and lightweight coroutine scheduling.
+- **Files**: Three standalone implementations (`fork_version.cpp`, `thread_version.cpp`, `coroutine_version.cpp`) + pytest benchmarks.
+- **Quick Start**:
+  ```bash
+  cd Fork-Thread-Coroutine
+  g++ -std=c++20 -O2 -pthread src/fork_version.cpp -o fork
+  ./fork 100000 24
+  ```
 
-### Improvements in Functional Programming with Coroutines
+#### 2. Functional-Program-Style
+Illustrates how coroutines improve functional programming by enabling cleaner async/await patterns compared to traditional callback-based approaches.
+- **Learn**: Sequential-style async composition, avoiding callback hell, and matching the "functional" paradigm with coroutines.
+- **Files**: `traditional_async.cpp` (callback-based) vs `coroutine_async.cpp` (C++20 coroutines) for direct comparison.
+- **Quick Start**:
+  ```bash
+  cd Functional-Program-Style/src
+  g++ -std=c++20 -O2 -pthread coroutine_async.cpp -o coroutine
+  ./coroutine 100
+  ```
 
-Coroutines significantly enhance functional programming in C++ by allowing asynchronous operations to be expressed in a sequential, composable style using `co_await`. This addresses common pain points in functional async code:
-
-- **Avoiding Callback Hell**: Traditional asynchronous programming relies on callbacks or futures, which can lead to deeply nested, hard-to-read code. Coroutines flatten this into linear, readable sequences.
-- **Composability**: Async functions can be composed like regular functions, making it easier to build complex workflows without manual promise chaining.
-- **Error Handling**: Exceptions work naturally across suspension points, unlike callback-based error propagation.
-- **Readability**: Code resembles synchronous logic, improving maintainability and reducing bugs in functional-style async applications.
+#### 3. PrimaryCoroutineType
+Demonstrates the primary C++20 coroutine return-type designs: eager tasks, lazy tasks, fire-and-forget, generators, and signalling awaitables.
+- **Learn**: Core coroutine patterns used in real-world libraries and frameworks; understanding suspension, resumption, and control flow.
+- **Files**: Modular header library with individual types (`eager_task.hpp`, `lazy_task.hpp`, `generator.hpp`) + example usage.
+- **Quick Start**:
+  ```bash
+  cd PrimaryCoroutineType
+  mkdir -p build
+  g++ -std=c++20 -O2 -pthread src/main.cpp -o build/primary_coroutine_types
+  ./build/primary_coroutine_types
+  ```
 
 ### Comparison Among Fork, Thread, and Coroutine
 
@@ -88,3 +110,24 @@ Here's a consolidated comparison of the three concurrency models used in this re
 - **Fork**: Ideal for tasks requiring strong isolation (e.g., security-critical computations), but expensive for frequent use.
 - **Thread**: Balances parallelism and ease; great for CPU-intensive work on multi-core systems.
 - **Coroutine**: Excels in structuring complex async logic, especially in functional programming, but may need threading for full multi-core utilization.
+
+### Improvements in Functional Programming with Coroutines
+
+Coroutines significantly enhance functional programming in C++ by allowing asynchronous operations to be expressed in a sequential, composable style using `co_await`. This addresses common pain points in functional async code:
+
+- **Avoiding Callback Hell**: Traditional asynchronous programming relies on callbacks or futures, which can lead to deeply nested, hard-to-read code. Coroutines flatten this into linear, readable sequences.
+- **Composability**: Async functions can be composed like regular functions, making it easier to build complex workflows without manual promise chaining.
+- **Error Handling**: Exceptions work naturally across suspension points, unlike callback-based error propagation.
+- **Readability**: Code resembles synchronous logic, improving maintainability and reducing bugs in functional-style async applications.
+
+### Primary Coroutine Types (PrimaryCoroutineType Reference)
+
+Each coroutine type has a distinct design determined by its **Return Type** and **Promise Type**:
+
+| Type | Starts On Call? | Awaitable? | Use Case |
+|------|-----------------|-----------|----------|
+| **Eager Task** | ✓ Yes | ✓ Yes | General async work; classic "future" pattern |
+| **Lazy Task** | ✗ No | ✓ Yes | Cold pipelines; execute on-demand |
+| **Fire-and-Forget** | ✓ Yes | ✗ No | Background tasks; logging, telemetry |
+| **Generator** | ✗ No | ✓ Yes (on co_yield) | Lazy sequences; streaming data |
+| **Signalling Awaitable** | ✗ Depends | ✓ Yes | Event-driven resumption from external triggers |

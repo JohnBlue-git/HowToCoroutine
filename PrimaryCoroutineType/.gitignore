@@ -1,0 +1,29 @@
+# C++ build artifacts
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.dylib
+*.exe
+*.out
+
+# Project binaries
+primary_coroutine_types
+primary_coroutine_types_split
+
+# Build directories
+build/
+cmake-build-*/
+
+# Python cache and virtual environments
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# VS Code workspace settings (optional)
+.vscode/
