@@ -87,7 +87,7 @@ struct task {
             return task{handle_type::from_promise(*this)};
         }
 
-        auto initial_suspend() noexcept { return std::suspend_always{}; }
+        auto initial_suspend() noexcept { return std::suspend_never{}; }
 
         // Final suspend returns control to the continuation (the awaiting coroutine)
         struct final_awaiter {
@@ -121,18 +121,12 @@ task<int> async_sum(int count) {
     tasks.reserve(count);
 
     // 1. Launch/Create all tasks
-    // They are created in a suspended state (initial_suspend).
+    // They are created in non-suspend (initial_suspend return std::suspend_never{}).
     for (int i = 1; i <= count; ++i) {
         tasks.push_back(async_double(i));
     }
 
-    // 2. Manually trigger them to enter the scheduler
-    // This allows them to run "in parallel" within the scheduler's queue.
-    for (auto& t : tasks) {
-        t.start(); 
-    }
-
-    // 3. Await points for all tasks
+    // 2. Await points for all tasks
     int total = 0;
     for (auto& t : tasks) {
         // If the task is already done, co_await returns immediately.
